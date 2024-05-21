@@ -1,8 +1,6 @@
 import streamlit as st
 from dao.ICarLeaseRepositoryImpl import ICarLeaseRepositoryImpl
 from exception.myexceptions import *
-from pyodbc import *
-from tabulate import tabulate
 from datetime import datetime
 
 
@@ -11,6 +9,7 @@ class CarRentalSystem:
         self.car_lease_repository = ICarLeaseRepositoryImpl()
 
     def main(self):
+        st.set_page_config(page_title="Car Rental System", layout="wide")
         st.title("Car Rental System")
         menu = [
             "Customer Management",
@@ -33,14 +32,14 @@ class CarRentalSystem:
             st.write("Exiting program.")
 
     def customer_management(self):
-        st.subheader("Customer Management")
+        st.subheader("> Customer Management")
         sub_menu = [
             "Add Customer",
             "Remove Customer",
             "List Customers",
             "Find Customer by ID",
         ]
-        sub_choice = st.selectbox("Options", sub_menu)
+        sub_choice = st.sidebar.selectbox("Options", sub_menu)
 
         if sub_choice == "Add Customer":
             self.add_customer()
@@ -53,29 +52,45 @@ class CarRentalSystem:
 
     def add_customer(self):
         st.subheader("Add Customer")
-        customer_id = st.text_input("Enter new customer ID:")
-        first_name = st.text_input("Enter first name:")
-        last_name = st.text_input("Enter last name:")
-        email = st.text_input("Enter email:")
-        phone_number = st.text_input("Enter phone number:")
+        with st.form("Add Customer Form"):
+            customer_id = st.text_input("Enter new customer ID:")
+            first_name = st.text_input("Enter first name:")
+            last_name = st.text_input("Enter last name:")
+            email = st.text_input("Enter email:")
+            phone_number = st.text_input("Enter phone number:")
+            submitted = st.form_submit_button("Add Customer")
 
-        if st.button("Add Customer"):
+        if submitted:
             try:
-                self.car_lease_repository.add_customer(
-                    customer_id, first_name, last_name, email, phone_number
-                )
-                st.success("Customer added successfully.")
+                if (
+                    not customer_id
+                    or not first_name
+                    or not last_name
+                    or not email
+                    or not phone_number
+                ):
+                    st.error("Please fill in all fields.")
+                else:
+                    self.car_lease_repository.add_customer(
+                        customer_id, first_name, last_name, email, phone_number
+                    )
+                    st.success("Customer added successfully.")
             except Exception as e:
                 st.error(f"Error adding customer: {e}")
 
     def remove_customer(self):
         st.subheader("Remove Customer")
-        customer_id = st.text_input("Enter customer ID to remove:")
+        with st.form("Remove Customer Form"):
+            customer_id = st.text_input("Enter customer ID to remove:")
+            submitted = st.form_submit_button("Remove Customer")
 
-        if st.button("Remove Customer"):
+        if submitted:
             try:
-                self.car_lease_repository.remove_customer(customer_id)
-                st.success("Customer removed successfully.")
+                if not customer_id:
+                    st.error("Please enter a customer ID.")
+                else:
+                    self.car_lease_repository.remove_customer(customer_id)
+                    st.success("Customer removed successfully.")
             except Exception as e:
                 st.error(f"Error removing customer: {e}")
 
@@ -92,20 +107,27 @@ class CarRentalSystem:
 
     def find_customer_by_id(self):
         st.subheader("Find Customer by ID")
-        customer_id = st.text_input("Enter customer ID to find:")
+        with st.form("Find Customer Form"):
+            customer_id = st.text_input("Enter customer ID to find:")
+            submitted = st.form_submit_button("Find Customer")
 
-        if st.button("Find Customer"):
+        if submitted:
             try:
-                customer = self.car_lease_repository.find_customer_by_id(customer_id)
-                if customer:
-                    st.write(customer)
+                if not customer_id:
+                    st.error("Please enter a customer ID.")
                 else:
-                    st.info("Customer not found.")
+                    customer = self.car_lease_repository.find_customer_by_id(
+                        customer_id
+                    )
+                    if customer:
+                        st.write(customer)
+                    else:
+                        st.info("Customer not found.")
             except CustomerNotFoundException as e:
                 st.error(f"Error: {e}")
 
     def vehicle_management(self):
-        st.subheader("Vehicle Management")
+        st.subheader("> Vehicle Management")
         sub_menu = [
             "Add Vehicle",
             "Remove Vehicle",
@@ -113,7 +135,7 @@ class CarRentalSystem:
             "List Rented Cars",
             "Find Car by ID",
         ]
-        sub_choice = st.selectbox("Options", sub_menu)
+        sub_choice = st.sidebar.selectbox("Options", sub_menu)
 
         if sub_choice == "Add Vehicle":
             self.add_car()
@@ -128,41 +150,62 @@ class CarRentalSystem:
 
     def add_car(self):
         st.subheader("Add Vehicle")
-        vehicle_id = st.text_input("Enter vehicle ID:")
-        make = st.text_input("Enter make:")
-        model = st.text_input("Enter model:")
-        year = st.number_input(
-            "Enter year:", min_value=1900, max_value=datetime.now().year
-        )
-        daily_rate = st.number_input("Enter daily rate:")
-        status = st.selectbox("Enter status:", ["available", "notAvailable"])
-        passenger_capacity = st.number_input("Enter passenger capacity:", min_value=1)
-        engine_capacity = st.number_input("Enter engine capacity:")
+        with st.form("Add Vehicle Form"):
+            vehicle_id = st.text_input("Enter vehicle ID:")
+            make = st.text_input("Enter make:")
+            model = st.text_input("Enter model:")
+            year = st.number_input(
+                "Enter year:", min_value=1900, max_value=datetime.now().year
+            )
+            daily_rate = st.number_input("Enter daily rate:")
+            status = st.selectbox("Enter status:", ["available", "notAvailable"])
+            passenger_capacity = st.number_input(
+                "Enter passenger capacity:", min_value=1
+            )
+            engine_capacity = st.number_input("Enter engine capacity:")
+            submitted = st.form_submit_button("Add Vehicle")
 
-        if st.button("Add Vehicle"):
+        if submitted:
             try:
-                self.car_lease_repository.add_car(
-                    vehicle_id,
-                    make,
-                    model,
-                    year,
-                    daily_rate,
-                    status,
-                    passenger_capacity,
-                    engine_capacity,
-                )
-                st.success("Vehicle added successfully.")
+                if (
+                    not vehicle_id
+                    or not make
+                    or not model
+                    or not year
+                    or not daily_rate
+                    or not status
+                    or not passenger_capacity
+                    or not engine_capacity
+                ):
+                    st.error("Please fill in all fields.")
+                else:
+                    self.car_lease_repository.add_car(
+                        vehicle_id,
+                        make,
+                        model,
+                        year,
+                        daily_rate,
+                        status,
+                        passenger_capacity,
+                        engine_capacity,
+                    )
+                    st.success("Vehicle added successfully.")
             except Exception as e:
                 st.error(f"Error adding vehicle: {e}")
 
     def remove_car(self):
         st.subheader("Remove Vehicle")
-        vehicle_id = st.text_input("Enter vehicle ID to remove:")
+        with st.form("Remove Vehicle Form"):
+            vehicle_id = st.text_input("Enter vehicle ID to remove:")
+            submitted = st.form_submit_button("Remove Vehicle")
 
-        if st.button("Remove Vehicle"):
+        if submitted:
             try:
-                self.car_lease_repository.remove_car(vehicle_id)
-                st.success("Vehicle removed successfully.")
+                if not vehicle_id:
+                    st.error("Please enter a vehicle ID.")
+                else:
+                    self.car_lease_repository.remove_car(vehicle_id)
+                    st.success("Vehicle removed successfully.")
             except Exception as e:
                 st.error(f"Error removing vehicle: {e}")
 
@@ -190,27 +233,32 @@ class CarRentalSystem:
 
     def find_car_by_id(self):
         st.subheader("Find Car by ID")
-        car_id = st.text_input("Enter car ID to find:")
+        with st.form("Find Car Form"):
+            car_id = st.text_input("Enter car ID to find:")
+            submitted = st.form_submit_button("Find Car")
 
-        if st.button("Find Car"):
+        if submitted:
             try:
-                car = self.car_lease_repository.find_car_by_id(car_id)
-                if car:
-                    st.write(car)
+                if not car_id:
+                    st.error("Please enter a car ID.")
                 else:
-                    st.info("Car not found.")
+                    car = self.car_lease_repository.find_car_by_id(car_id)
+                    if car:
+                        st.write(car)
+                    else:
+                        st.info("Car not found.")
             except VehicleNotFoundException as e:
                 st.error(f"Error: {e}")
 
     def lease_management(self):
-        st.subheader("Lease Management")
+        st.subheader("> Lease Management")
         sub_menu = [
             "Create Lease",
             "Return Car",
             "List Active Leases",
             "List Lease History",
         ]
-        sub_choice = st.selectbox("Options", sub_menu)
+        sub_choice = st.sidebar.selectbox("Options", sub_menu)
 
         if sub_choice == "Create Lease":
             self.create_lease()
@@ -223,30 +271,49 @@ class CarRentalSystem:
 
     def create_lease(self):
         st.subheader("Create Lease")
-        lease_id = st.text_input("Enter new lease ID:")
-        customer_id = st.text_input("Enter customer ID:")
-        car_id = st.text_input("Enter car ID:")
-        start_date = st.date_input("Enter start date:")
-        end_date = st.date_input("Enter end date:")
-        lease_type = st.selectbox("Enter lease type:", ["DailyLease", "MonthlyLease"])
+        with st.form("Create Lease Form"):
+            lease_id = st.text_input("Enter new lease ID:")
+            customer_id = st.text_input("Enter customer ID:")
+            car_id = st.text_input("Enter car ID:")
+            start_date = st.date_input("Enter start date:")
+            end_date = st.date_input("Enter end date:")
+            lease_type = st.selectbox(
+                "Enter lease type:", ["DailyLease", "MonthlyLease"]
+            )
+            submitted = st.form_submit_button("Create Lease")
 
-        if st.button("Create Lease"):
+        if submitted:
             try:
-                self.car_lease_repository.create_lease(
-                    lease_id, customer_id, car_id, start_date, end_date, lease_type
-                )
-                st.success("Lease created successfully.")
+                if (
+                    not lease_id
+                    or not customer_id
+                    or not car_id
+                    or not start_date
+                    or not end_date
+                    or not lease_type
+                ):
+                    st.error("Please fill in all fields.")
+                else:
+                    self.car_lease_repository.create_lease(
+                        lease_id, customer_id, car_id, start_date, end_date, lease_type
+                    )
+                    st.success("Lease created successfully.")
             except Exception as e:
                 st.error(f"Error creating lease: {e}")
 
     def return_car(self):
         st.subheader("Return Car")
-        lease_id = st.text_input("Enter lease ID to return the car:")
+        with st.form("Return Car Form"):
+            lease_id = st.text_input("Enter lease ID to return the car:")
+            submitted = st.form_submit_button("Return Car")
 
-        if st.button("Return Car"):
+        if submitted:
             try:
-                self.car_lease_repository.return_car(lease_id)
-                st.success("Car returned successfully.")
+                if not lease_id:
+                    st.error("Please enter a lease ID.")
+                else:
+                    self.car_lease_repository.return_car(lease_id)
+                    st.success("Car returned successfully.")
             except Exception as e:
                 st.error(f"Error returning car: {e}")
 
@@ -273,14 +340,14 @@ class CarRentalSystem:
             st.error(f"Error listing lease history: {e}")
 
     def payment_handling(self):
-        st.subheader("Payment Handling")
+        st.subheader("> Payment Handling")
         sub_menu = [
             "Record Payment",
             "Retrieve Payment History",
             "Calculate Total Revenue",
             "List All Payments",
         ]
-        sub_choice = st.selectbox("Options", sub_menu)
+        sub_choice = st.sidebar.selectbox("Options", sub_menu)
 
         if sub_choice == "Record Payment":
             self.record_payment()
@@ -293,17 +360,22 @@ class CarRentalSystem:
 
     def record_payment(self):
         st.subheader("Record Payment")
-        payment_id = st.text_input("Enter new payment ID:")
-        lease_id = st.text_input("Enter lease ID:")
-        payment_date = st.date_input("Enter payment date:")
-        amount = st.number_input("Enter payment amount:")
+        with st.form("Record Payment Form"):
+            payment_id = st.text_input("Enter new payment ID:")
+            lease_id = st.text_input("Enter lease ID:")
+            payment_date = st.date_input("Enter payment date:")
+            amount = st.number_input("Enter payment amount:")
+            submitted = st.form_submit_button("Record Payment")
 
-        if st.button("Record Payment"):
+        if submitted:
             try:
-                self.car_lease_repository.record_payment(
-                    payment_id, lease_id, payment_date, amount
-                )
-                st.success("Payment recorded successfully.")
+                if not payment_id or not lease_id or not payment_date or not amount:
+                    st.error("Please fill in all fields.")
+                else:
+                    self.car_lease_repository.record_payment(
+                        payment_id, lease_id, payment_date, amount
+                    )
+                    st.success("Payment recorded successfully.")
             except ValueError:
                 st.error(
                     "Invalid input. Please enter valid lease ID, payment date, and payment amount."
@@ -313,15 +385,22 @@ class CarRentalSystem:
 
     def retrieve_payment_history(self):
         st.subheader("Retrieve Payment History")
-        lease_id = st.text_input("Enter lease ID:")
+        with st.form("Retrieve Payment History Form"):
+            lease_id = st.text_input("Enter lease ID:")
+            submitted = st.form_submit_button("Retrieve Payment History")
 
-        if st.button("Retrieve Payment History"):
+        if submitted:
             try:
-                payments = self.car_lease_repository.retrieve_payment_history(lease_id)
-                if payments:
-                    st.write(payments)
+                if not lease_id:
+                    st.error("Please enter a lease ID.")
                 else:
-                    st.info("No payment history found for the given lease ID.")
+                    payments = self.car_lease_repository.retrieve_payment_history(
+                        lease_id
+                    )
+                    if payments:
+                        st.write(payments)
+                    else:
+                        st.info("No payment history found for the given lease ID.")
             except ValueError:
                 st.error("Invalid input. Please enter a valid lease ID.")
             except Exception as e:
