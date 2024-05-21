@@ -358,9 +358,10 @@ class ICarLeaseRepositoryImpl(ICarLeaseRepository):
                 payments = []
                 for row in cursor.fetchall():
                     payment = {
-                        "leaseID": row[0],
-                        "paymentDate": row[1],
-                        "amount": row[2],
+                        "paymentID": row[0],
+                        "leaseID": row[1],
+                        "paymentDate": row[2],
+                        "amount": row[3],
                     }
                     payments.append(payment)
                 return payments
