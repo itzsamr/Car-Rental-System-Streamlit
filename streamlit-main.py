@@ -110,21 +110,25 @@ class CarRentalSystem:
         with st.form("Find Customer Form"):
             customer_id = st.text_input("Enter customer ID to find:")
             submitted = st.form_submit_button("Find Customer")
-
         if submitted:
             try:
                 if not customer_id:
                     st.error("Please enter a customer ID.")
                 else:
                     customer = self.car_lease_repository.find_customer_by_id(
-                        customer_id
+                        int(customer_id)
                     )
                     if customer:
-                        st.table(customer)
-                    else:
-                        st.info("Customer not found.")
-            except CustomerNotFoundException as e:
-                st.error(f"Error: {e}")
+                        customer_data = {
+                            "customerID": customer["customerID"],
+                            "firstName": customer["firstName"],
+                            "lastName": customer["lastName"],
+                            "email": customer["email"],
+                            "phoneNumber": customer["phoneNumber"],
+                        }
+                        st.table([customer_data])
+            except Exception as e:
+                st.error(f"Error finding customer: {e}")
 
     def vehicle_management(self):
         st.subheader("> Vehicle Management")
@@ -242,13 +246,24 @@ class CarRentalSystem:
                 if not car_id:
                     st.error("Please enter a car ID.")
                 else:
-                    car = self.car_lease_repository.find_car_by_id(car_id)
+                    car = self.car_lease_repository.find_car_by_id(int(car_id))
                     if car:
-                        st.write(car)
+
+                        car_data = {
+                            "carID": car["carID"],
+                            "make": car["make"],
+                            "model": car["model"],
+                            "year": car["year"],
+                            "dailyRate": car["dailyRate"],
+                            "status": car["status"],
+                            "passengerCapacity": car["passengerCapacity"],
+                            "engineCapacity": car["engineCapacity"],
+                        }
+                        st.table([car_data])
                     else:
-                        st.info("Car not found.")
-            except VehicleNotFoundException as e:
-                st.error(f"Error: {e}")
+                        st.info(f"Car with ID {car_id} not found.")
+            except Exception as e:
+                st.error(f"Error finding car: {e}")
 
     def lease_management(self):
         st.subheader("> Lease Management")
