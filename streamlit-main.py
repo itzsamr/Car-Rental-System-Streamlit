@@ -99,7 +99,7 @@ class CarRentalSystem:
         try:
             customers = self.car_lease_repository.list_customers()
             if customers:
-                st.write(customers)
+                st.table(customers)
             else:
                 st.info("No customers found.")
         except Exception as e:
@@ -120,7 +120,7 @@ class CarRentalSystem:
                         customer_id
                     )
                     if customer:
-                        st.write(customer)
+                        st.table(customer)
                     else:
                         st.info("Customer not found.")
             except CustomerNotFoundException as e:
@@ -214,7 +214,7 @@ class CarRentalSystem:
         try:
             cars = self.car_lease_repository.list_available_cars()
             if cars:
-                st.write(cars)
+                st.table(cars)
             else:
                 st.info("No available cars found.")
         except Exception as e:
@@ -225,7 +225,7 @@ class CarRentalSystem:
         try:
             cars = self.car_lease_repository.list_of_rented_cars()
             if cars:
-                st.write(cars)
+                st.table(cars)
             else:
                 st.info("No rented cars found.")
         except Exception as e:
@@ -322,7 +322,7 @@ class CarRentalSystem:
         try:
             leases = self.car_lease_repository.list_active_leases()
             if leases:
-                st.write(leases)
+                st.table(leases)
             else:
                 st.info("No active leases found.")
         except Exception as e:
@@ -333,7 +333,7 @@ class CarRentalSystem:
         try:
             leases = self.car_lease_repository.list_lease_history()
             if leases:
-                st.write(leases)
+                st.table(leases)
             else:
                 st.info("No lease history found.")
         except Exception as e:
@@ -398,7 +398,7 @@ class CarRentalSystem:
                         lease_id
                     )
                     if payments:
-                        st.write(payments)
+                        st.table(payments)
                     else:
                         st.info("No payment history found for the given lease ID.")
             except ValueError:
@@ -411,7 +411,7 @@ class CarRentalSystem:
         if st.button("Calculate"):
             try:
                 total_revenue = self.car_lease_repository.calculate_total_revenue()
-                st.write(f"Total Revenue: {total_revenue}")
+                st.write(f"### Total Revenue: ${total_revenue:.2f}")
             except Exception as e:
                 st.error(f"Error calculating total revenue: {e}")
 
@@ -420,7 +420,7 @@ class CarRentalSystem:
         try:
             payments = self.car_lease_repository.list_all_payments()
             if payments:
-                st.write(payments)
+                st.table(payments)
             else:
                 st.info("No payments found.")
         except Exception as e:
