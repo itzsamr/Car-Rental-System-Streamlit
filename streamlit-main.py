@@ -10,7 +10,7 @@ class CarRentalSystem:
 
     def main(self):
         st.set_page_config(page_title="Car Rental System", layout="wide")
-        st.title("Car Rental System")
+        st.title("CAR RENTAL SYSTEM")
         menu = [
             "Customer Management",
             "Vehicle Management",
@@ -32,7 +32,7 @@ class CarRentalSystem:
             st.write("Exiting program.")
 
     def customer_management(self):
-        st.subheader("> Customer Management")
+        st.subheader("🚩Customer Management")
         sub_menu = [
             "Add Customer",
             "Remove Customer",
@@ -131,7 +131,7 @@ class CarRentalSystem:
                 st.error(f"Error finding customer: {e}")
 
     def vehicle_management(self):
-        st.subheader("> Vehicle Management")
+        st.subheader("🚩Vehicle Management")
         sub_menu = [
             "Add Vehicle",
             "Remove Vehicle",
@@ -266,7 +266,7 @@ class CarRentalSystem:
                 st.error(f"Error finding car: {e}")
 
     def lease_management(self):
-        st.subheader("> Lease Management")
+        st.subheader("🚩Lease Management")
         sub_menu = [
             "Create Lease",
             "Return Car",
@@ -355,7 +355,7 @@ class CarRentalSystem:
             st.error(f"Error listing lease history: {e}")
 
     def payment_handling(self):
-        st.subheader("> Payment Handling")
+        st.subheader("🚩Payment Handling")
         sub_menu = [
             "Record Payment",
             "Retrieve Payment History",
@@ -427,6 +427,7 @@ class CarRentalSystem:
             try:
                 total_revenue = self.car_lease_repository.calculate_total_revenue()
                 st.write(f"### Total Revenue: ${total_revenue:.2f}")
+                st.balloons()
             except Exception as e:
                 st.error(f"Error calculating total revenue: {e}")
 
