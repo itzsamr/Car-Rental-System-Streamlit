@@ -2,6 +2,8 @@ import streamlit as st
 from dao.ICarLeaseRepositoryImpl import ICarLeaseRepositoryImpl
 from exception.myexceptions import *
 from datetime import datetime
+import pandas as pd
+import plotly.express as px
 
 
 class CarRentalSystem:
@@ -436,7 +438,16 @@ class CarRentalSystem:
         try:
             payments = self.car_lease_repository.list_all_payments()
             if payments:
-                st.table(payments)
+                df = pd.DataFrame(payments)
+                visualize = st.sidebar.button("Visualize")
+                if visualize:
+                    df["paymentDate"] = pd.to_datetime(df["paymentDate"])
+                    fig = px.bar(
+                        df, x="paymentDate", y="amount", title="PAYMENTS OVER TIME"
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
+                else:
+                    st.table(df)
             else:
                 st.info("No payments found.")
         except Exception as e:
