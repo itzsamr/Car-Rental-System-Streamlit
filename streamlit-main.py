@@ -4,6 +4,9 @@ from exception.myexceptions import *
 from datetime import datetime
 import pandas as pd
 import plotly.express as px
+import streamlit_lottie as st_lottie
+import json
+import os
 
 
 def authenticate(username, password):
@@ -18,19 +21,34 @@ class CarRentalSystem:
         st.set_page_config(page_title="Car Rental System", layout="wide")
         st.title("CAR RENTAL SYSTEM")
 
-        authenticated = st.sidebar.checkbox("Unlock Sidebar")
+        if "authenticated" not in st.session_state:
+            st.session_state.authenticated = False
 
-        if not authenticated:
-            username = st.text_input("Username: ")
-            password = st.text_input("Password: ", type="password")
-            if st.button("Login"):
-                if authenticate(username, password):
-                    st.success(f"Welcome, {username}! 🎉")
-                    authenticated = True
-                else:
-                    st.error("Invalid credentials. Please try again.")
+        def load_animation(path: str):
+            with open(path, "r") as file:
+                return json.load(file)
 
-        if authenticated:
+        animation_path = os.path.join(
+            os.getcwd(), "resources", "Animation - 1716484755503.json"
+        )
+        animation_data = load_animation(animation_path)
+
+        if not st.session_state.authenticated:
+            col1, col2 = st.columns(2)
+
+            with col1:
+                username = st.text_input("Username:")
+                password = st.text_input("Password:", type="password")
+                if st.button("Login"):
+                    if authenticate(username, password):
+                        st.session_state.authenticated = True
+                        st.success(f"Welcome, {username}! 🎉")
+                    else:
+                        st.error("Invalid credentials. Please try again.")
+            with col2:
+                st_lottie.st_lottie(animation_data, width=500, height=400)
+
+        if st.session_state.authenticated:
             menu = [
                 "Customer Management",
                 "Vehicle Management",
@@ -50,6 +68,7 @@ class CarRentalSystem:
                 self.payment_handling()
             elif choice == "Exit":
                 st.sidebar.write("Exiting program.")
+                st.session_state.authenticated = False
         else:
             st.write("Please login to access the Car Rental System.")
 
@@ -84,13 +103,7 @@ class CarRentalSystem:
 
         if submitted:
             try:
-                if (
-                    not customer_id
-                    or not first_name
-                    or not last_name
-                    or not email
-                    or not phone_number
-                ):
+                if not all([customer_id, first_name, last_name, email, phone_number]):
                     st.error("Please fill in all fields.")
                 else:
                     self.car_lease_repository.add_customer(
@@ -149,6 +162,8 @@ class CarRentalSystem:
                             "phoneNumber": customer["phoneNumber"],
                         }
                         st.table([customer_data])
+                    else:
+                        st.info(f"Customer with ID {customer_id} not found.")
             except Exception as e:
                 st.error(f"Error finding customer: {e}")
 
@@ -193,15 +208,17 @@ class CarRentalSystem:
 
         if submitted:
             try:
-                if (
-                    not vehicle_id
-                    or not make
-                    or not model
-                    or not year
-                    or not daily_rate
-                    or not status
-                    or not passenger_capacity
-                    or not engine_capacity
+                if not all(
+                    [
+                        vehicle_id,
+                        make,
+                        model,
+                        year,
+                        daily_rate,
+                        status,
+                        passenger_capacity,
+                        engine_capacity,
+                    ]
                 ):
                     st.error("Please fill in all fields.")
                 else:
@@ -270,7 +287,6 @@ class CarRentalSystem:
                 else:
                     car = self.car_lease_repository.find_car_by_id(int(car_id))
                     if car:
-
                         car_data = {
                             "carID": car["carID"],
                             "make": car["make"],
@@ -321,13 +337,8 @@ class CarRentalSystem:
 
         if submitted:
             try:
-                if (
-                    not lease_id
-                    or not customer_id
-                    or not car_id
-                    or not start_date
-                    or not end_date
-                    or not lease_type
+                if not all(
+                    [lease_id, customer_id, car_id, start_date, end_date, lease_type]
                 ):
                     st.error("Please fill in all fields.")
                 else:
@@ -406,7 +417,7 @@ class CarRentalSystem:
 
         if submitted:
             try:
-                if not payment_id or not lease_id or not payment_date or not amount:
+                if not all([payment_id, lease_id, payment_date, amount]):
                     st.error("Please fill in all fields.")
                 else:
                     self.car_lease_repository.record_payment(
