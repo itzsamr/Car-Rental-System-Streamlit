@@ -47,7 +47,7 @@ class CarRentalSystem:
             elif choice == "Lease Management":
                 self.lease_management()
             elif choice == "Payment Handling":
-                st.write("Placeholder for Payment Handling")
+                self.payment_handling()
             elif choice == "Exit":
                 st.sidebar.write("Exiting program.")
         else:
