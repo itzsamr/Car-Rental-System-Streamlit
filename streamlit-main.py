@@ -13,6 +13,14 @@ class CarRentalSystem:
     def main(self):
         st.set_page_config(page_title="Car Rental System", layout="wide")
         st.title("CAR RENTAL SYSTEM")
+        authenticated = st.sidebar.checkbox("Unlock Sidebar")
+
+        if authenticated:
+            self.display_menu()
+        else:
+            st.warning("Please login to access the Car Rental System.")
+
+    def display_menu(self):
         menu = [
             "Customer Management",
             "Vehicle Management",
