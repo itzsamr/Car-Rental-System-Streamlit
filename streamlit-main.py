@@ -6,6 +6,10 @@ import pandas as pd
 import plotly.express as px
 
 
+def authenticate(username, password):
+    return username == "admin" and password == "password"
+
+
 class CarRentalSystem:
     def __init__(self):
         self.car_lease_repository = ICarLeaseRepositoryImpl()
@@ -13,25 +17,41 @@ class CarRentalSystem:
     def main(self):
         st.set_page_config(page_title="Car Rental System", layout="wide")
         st.title("CAR RENTAL SYSTEM")
-        menu = [
-            "Customer Management",
-            "Vehicle Management",
-            "Lease Management",
-            "Payment Handling",
-            "Exit",
-        ]
-        choice = st.sidebar.selectbox("Main Menu", menu)
 
-        if choice == "Customer Management":
-            self.customer_management()
-        elif choice == "Vehicle Management":
-            self.vehicle_management()
-        elif choice == "Lease Management":
-            self.lease_management()
-        elif choice == "Payment Handling":
-            self.payment_handling()
-        elif choice == "Exit":
-            st.write("Exiting program.")
+        authenticated = st.sidebar.checkbox("Unlock Sidebar")
+
+        if not authenticated:
+            username = st.text_input("Username: ")
+            password = st.text_input("Password: ", type="password")
+            if st.button("Login"):
+                if authenticate(username, password):
+                    st.success(f"Welcome, {username}! 🎉")
+                    authenticated = True
+                else:
+                    st.error("Invalid credentials. Please try again.")
+
+        if authenticated:
+            menu = [
+                "Customer Management",
+                "Vehicle Management",
+                "Lease Management",
+                "Payment Handling",
+                "Exit",
+            ]
+            choice = st.sidebar.selectbox("Main Menu", menu)
+
+            if choice == "Customer Management":
+                self.customer_management()
+            elif choice == "Vehicle Management":
+                self.vehicle_management()
+            elif choice == "Lease Management":
+                self.lease_management()
+            elif choice == "Payment Handling":
+                st.write("Placeholder for Payment Handling")
+            elif choice == "Exit":
+                st.sidebar.write("Exiting program.")
+        else:
+            st.write("Please login to access the Car Rental System.")
 
     def customer_management(self):
         st.subheader("🚩Customer Management")
