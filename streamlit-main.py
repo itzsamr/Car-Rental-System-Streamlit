@@ -10,7 +10,10 @@ import os
 
 
 def authenticate(username, password):
-    return username == "admin" and password == "password"
+    if username == "admin" and password == "password":
+        return True
+    else:
+        return False
 
 
 class CarRentalSystem:
